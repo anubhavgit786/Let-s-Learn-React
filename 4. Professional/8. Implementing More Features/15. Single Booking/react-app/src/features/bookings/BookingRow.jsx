@@ -1,0 +1,99 @@
+import styled from 'styled-components';
+import { useNavigate } from 'react-router-dom';
+
+import Tag from '../../ui/Tag';
+import Table from '../../ui/Table';
+
+import { formatCurrency } from '../../utils/helpers';
+import { formatDistanceFromNow } from '../../utils/helpers';
+import { format, isToday } from 'date-fns';
+import Menus from '../../ui/Menus';
+import { HiEye } from 'react-icons/hi2';
+
+const Cabin = styled.div`
+  font-size: 1.6rem;
+  font-weight: 600;
+  color: var(--color-grey-600);
+  font-family: 'Sono';
+`;
+
+const Stacked = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+
+  & span:first-child {
+    font-weight: 500;
+  }
+
+  & span:last-child {
+    color: var(--color-grey-500);
+    font-size: 1.2rem;
+  }
+`;
+
+const Amount = styled.div`
+  font-family: 'Sono';
+  font-weight: 500;
+`;
+
+const BookingRow = ({booking})=> 
+{
+  const navigate = useNavigate();
+  const { id: bookingId, created_at, startDate, endDate, numNights, numGuests, totalPrice, status, guests, cabins } = booking;
+  const { fullName: guestName, email } = guests;
+  const { name: cabinName } = cabins;
+
+  const statusToTagName = { unconfirmed: 'blue', 'checked-in': 'green', 'checked-out': 'silver'};
+
+  const handleSeeDetails = ()=>
+  {
+    navigate(`/bookings/${bookingId}`);
+  }
+
+  return (
+    <Table.Row role='row'>
+      <Cabin>{cabinName}</Cabin>
+
+      <Stacked>
+        <span>{guestName}</span>
+        <span>{email}</span>
+      </Stacked>
+
+      <Stacked>
+        <span>{isToday(new Date(startDate)) ? 'Today' : formatDistanceFromNow(startDate)}{' '} &rarr; {numNights} night stay</span>
+        <span>{format(new Date(startDate), 'MMM dd yyyy')} &mdash;{' '}{format(new Date(endDate), 'MMM dd yyyy')}</span>
+      </Stacked>
+
+      <Tag type={statusToTagName[status]}>{status.replace('-', ' ')}</Tag>
+
+      <Amount>{formatCurrency(totalPrice)}</Amount>
+      <Menus.Menu>
+        <Menus.Toggle id={bookingId} />
+        <Menus.List id={bookingId}>
+          
+          <Menus.Button icon={<HiEye/>} onClick={handleSeeDetails}>See Details</Menus.Button>
+          
+          {/* <Modal.Open opens="cabin-edit-form">
+            <Menus.Button icon={<HiPencil/>}>Edit</Menus.Button>
+          </Modal.Open>
+          
+          <Modal.Open opens="cabin-delete">
+            <Menus.Button icon={<HiTrash/>}>Delete</Menus.Button>
+          </Modal.Open>
+          
+        </Menus.List>
+        <Modal.Window name="cabin-edit-form">
+          <CreateCabinForm cabinToEdit={cabin}/>
+        </Modal.Window>
+        
+        <Modal.Window name="cabin-delete">
+          <ConfirmDelete resource="cabins" disabled={isDeleting} onConfirm={()=> onDeleteCabin(cabinID)} />
+        </Modal.Window> */}
+         </Menus.List>
+        </Menus.Menu>
+    </Table.Row>
+  );
+}
+
+export default BookingRow;

@@ -40,6 +40,8 @@ const ErrorMessage = ({ message })=>
   </p>);
 }
 
+
+
 //Structural Component
 const App = ()=> 
 {
@@ -122,7 +124,7 @@ const App = ()=>
       controller.abort();
     }
   }, [query]);
-
+  
   return (
   <>
     <NavBar>
